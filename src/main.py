@@ -12,10 +12,12 @@ if __name__ == "__main__":
     print("Program Starting")
 
     # Import controller config
-    dirname = os.path.dirname(__file__).join("../")
+    dirname = os.path.dirname(__file__)
     dirname = os.path.join(dirname, "../")
 
-    wp_path = os.path.join(dirname)
+    cp_path = os.path.join(dirname, CTRL_PARAMS)
+    wp_path = os.path.join(dirname, WAYPOINTS_FILE)
+    
     print(dirname)
     
     # Print initialization time
