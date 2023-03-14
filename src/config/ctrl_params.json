@@ -1,0 +1,26 @@
+{
+    "x-position": {
+        "p_gain": 1,
+        "i_gain": 1,
+        "d_gain": 0,
+        "limit": 0.4
+    },
+    "y-position": {
+        "p_gain": 1,
+        "i_gain": 1,
+        "d_gain": 0,
+        "limit": 0.4
+    },
+    "x-velocity": {
+        "p_gain": 1,
+        "i_gain": 1,
+        "d_gain": 0,
+        "limit": 0.4
+    },
+    "y-velocity": {
+        "p_gain": 1,
+        "i_gain": 1,
+        "d_gain": 0,
+        "limit": 0.4
+    }
+}
