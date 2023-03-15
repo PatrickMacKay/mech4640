@@ -20,7 +20,6 @@ class PIDController:
     state = 0
     prevErr = 0
     output = 0
-    timer = Timer()
 
     # Constructor accepts controller gains and a limit.
     def __init__(self, p, i, d, limit):
@@ -29,10 +28,7 @@ class PIDController:
         self.d_gain = d
         self.limit = limit
     
-    def update(self):
-
-        # Calculate time delta
-        dt = self.timer.elapsed()
+    def update(self, dt):
 
         # Calculate error
         err = self.state - self.setpoint
