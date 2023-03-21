@@ -2,7 +2,7 @@
 import re
 import smbus
 
-from dt_device_utils import get_device_hardware_brand, DeviceHardwareBrand
+from lib.dt_device_utils import get_device_hardware_brand, DeviceHardwareBrand
 
 ROBOT_HARDWARE = get_device_hardware_brand()
 

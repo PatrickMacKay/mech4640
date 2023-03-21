@@ -2,8 +2,9 @@
 
 from math import fabs, floor
 
-import hat_driver #/include/hat_driver
-from dt_robot_utils import get_robot_configuration # DuckieTown-only code
+from lib import hat_driver
+#import hat_driver #/include/hat_driver
+from lib.dt_robot_utils import get_robot_configuration # DuckieTown-only code
 
 
 MotorDirection = hat_driver.MotorDirection

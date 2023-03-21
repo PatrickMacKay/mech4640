@@ -22,13 +22,13 @@ import dataclasses
 from enum import IntEnum
 from abc import abstractmethod, ABC
 
-from Adafruit_PWM_Servo_Driver import PWM
+from lib.Adafruit_PWM_Servo_Driver import PWM
 
 # from .constants import LOW, HIGH
 # from .gpio import LOW as GPIO_LOW, HIGH as GPIO_HIGH
 # from .pwm import LOW as PWM_LOW, HIGH as PWM_HIGH
 
-from dt_device_utils import get_device_hardware_brand, DeviceHardwareBrand
+from lib.dt_device_utils import get_device_hardware_brand, DeviceHardwareBrand
 ROBOT_HARDWARE = DeviceHardwareBrand.RASPBERRY_PI #get_device_hardware_brand()
 
 if ROBOT_HARDWARE in [DeviceHardwareBrand.RASPBERRY_PI, DeviceHardwareBrand.RASPBERRY_PI_64]:
@@ -162,7 +162,7 @@ class Motor:
 from typing import Dict
 from abc import abstractmethod, ABC
 
-from Adafruit_PWM_Servo_Driver import PWM
+from lib.Adafruit_PWM_Servo_Driver import PWM
 
 # from .motor import Motor, MotorPins, MotorDirectionControl
 
@@ -209,7 +209,7 @@ class HATv3(HATv2):
     }
 
 # utils
-from dt_robot_utils import RobotConfiguration, get_robot_configuration
+from lib.dt_robot_utils import RobotConfiguration, get_robot_configuration
 
 # from .hat import HATv1, HATv2, HATv3
 

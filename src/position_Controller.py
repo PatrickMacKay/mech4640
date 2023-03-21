@@ -3,6 +3,9 @@ from util.timer import Timer
 from motorDriver import velocityController
 from util.PIDController import PIDController
 
+def clamp(n, smallest, largest):
+    return max(smallest, min(n, largest))
+
 class PoistionController:
     wheel_base_width = 0.095
 
@@ -11,8 +14,8 @@ class PoistionController:
         self.i = i
         self.d = d
 
-        self.vel_limit = 1 # m/s
-        self.angvel_limit = 0.5 # m/s
+        self.vel_limit = 0.1 # m/s
+        self.angvel_limit = 1 # m/s
         self.xtarget = xtarget
         self.ytarget = ytarget
         self.thtarget = thtarget
@@ -53,17 +56,21 @@ class PoistionController:
 
     def update_vel(self, dt):
         # based on current and target position, update velocity
-        self.PIDx.state = self.xmeasure
-        self.PIDy.state = self.ymeasure
+        #self.PIDx.state = self.xmeasure
+        #self.PIDy.state = self.ymeasure
         vel = np.sqrt(np.square(self.xtarget-self.xmeasure)+np.square(self.ytarget-self.ymeasure))
-        vel = max(vel, self.vel_limit)
-        th_to_target = np.arctan2((self.ytarget-self.ymeasure)/(self.xtarget-self.ymeasure))
+        #vel = max(vel, self.vel_limit)
+        vel = clamp(vel, 0, self.vel_limit)
+        th_to_target = np.arctan2(self.ytarget - self.ymeasure, self.xtarget - self.ymeasure)
 
-        ang_vel = max(self.angdiff(self.thmeasure, th_to_target), self.angvel_limit)
+        ang_vel = self.angdiff(self.thmeasure, th_to_target)
+        ang_vel = clamp(ang_vel, 0, self.angvel_limit)
 
         # calculate R & L wheel velocities based
         v_R = vel + ang_vel * self.wheel_base_width / 2
         v_L = vel - ang_vel * self.wheel_base_width / 2
+
+        #print("Velocities: ", v_L, ", ", v_R)
 
         self.vc.moveVel(v_L, v_R)
 
@@ -97,5 +104,3 @@ class PoistionController:
         diff_rad = diff * np.pi/180
 
         return diff_rad
-
-

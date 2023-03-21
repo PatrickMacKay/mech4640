@@ -8,7 +8,7 @@ from plot import plot_results
 from position_Controller import PoistionController
 
 CTRL_PARAMS = "config/ctrl_params.json"
-MOTOR_PARAMS = "config/motor_params.json"
+#MOTOR_PARAMS = "config/motor_params.json"
 
 #WAYPOINTS_FILE = "config/waypoints.json"
 WAYPOINTS_FILE = "config/one_waypoint.json"
@@ -26,13 +26,13 @@ if __name__ == "__main__":
     dirname = os.path.join(dirname, "../")
 
     cp_path = os.path.join(dirname, CTRL_PARAMS)
-    mp_path = os.path.join(dirname, MOTOR_PARAMS)
+    #mp_path = os.path.join(dirname, MOTOR_PARAMS)
     wp_path = os.path.join(dirname, WAYPOINTS_FILE)
 
     with open(cp_path) as cp_file:
         cp_json = json.loads(cp_file.read())
-    with open(mp_path) as mp_file:
-        mp_json = json.loads(mp_file.read())
+    #with open(mp_path) as mp_file:
+    #    mp_json = json.loads(mp_file.read())
     with open(wp_path) as wp_file:
         waypoints = json.loads(wp_file.read())
 
@@ -62,9 +62,10 @@ if __name__ == "__main__":
 
         timer = Timer()
 
-        while pc.dist_to_target > 0.03:
+        while pc.dist_to_target() > 0.1:
             # Move it
             pc.update(timer.elapsed())
+            print("Current position: ", pc.xmeasure, ", ", pc.ymeasure)
             timer.reset()
             time.sleep(0.2)
 
