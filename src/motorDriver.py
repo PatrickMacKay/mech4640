@@ -1,8 +1,8 @@
 import sys # Setting up PATH, will move to Path.py
 import os
-sys.path.insert(0,os.getcwd())  #sys.path.insert(0,'/home/pi/Documents/Code') # Explicit
-sys.path.append('../lib') 	# This allows the system path to look in the 'libraries' directory co-located with this script.
-from dagu_wheels_driver import DaguWheelsDriver  # Need path in order to call dagu_wheels_driver
+#sys.path.insert(0,os.getcwd())  #sys.path.insert(0,'/home/pi/Documents/Code') # Explicit
+#sys.path.append('../lib') 	# This allows the system path to look in the 'libraries' directory co-located with this script.
+from lib.dagu_wheels_driver import DaguWheelsDriver  # Need path in order to call dagu_wheels_driver
 import time
 import math as m
 import numpy as np
