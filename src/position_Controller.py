@@ -14,8 +14,10 @@ class PoistionController:
         self.i = i
         self.d = d
 
+        self.k_omega = 80
+
         self.vel_limit = 0.1 # m/s
-        self.angvel_limit = 1 # m/s
+        self.angvel_limit = 20 # m/s
         self.xtarget = xtarget
         self.ytarget = ytarget
         self.thtarget = thtarget
@@ -29,6 +31,9 @@ class PoistionController:
         self.PIDvel.setpoint = np.sqrt(np.square(self.xtarget)+np.square(self.ytarget))
         self.PIDth.setpoint = self.ytarget
 
+        self.v_R = 0
+        self.v_L = 0
+        self.ang_vel = 0
         self.xmeasure = 0
         self.ymeasure = 0
         self.thmeasure = 0
@@ -61,16 +66,21 @@ class PoistionController:
         vel = np.sqrt(np.square(self.xtarget-self.xmeasure)+np.square(self.ytarget-self.ymeasure))
         #vel = max(vel, self.vel_limit)
         vel = clamp(vel, 0, self.vel_limit)
-        th_to_target = np.arctan2(self.ytarget - self.ymeasure, self.xtarget - self.ymeasure)
-
-        ang_vel = self.angdiff(self.thmeasure, th_to_target)
+        th_to_target = np.arctan2(self.ytarget - self.ymeasure, self.xtarget - self.xmeasure)
+        # print("th measured", self.thmeasure)
+        ang_vel = self.k_omega * self.angdiff(th_to_target, self.thmeasure)
         ang_vel = clamp(ang_vel, 0, self.angvel_limit)
+        print("angular vel ", ang_vel)
+
+        self.ang_vel = ang_vel
 
         # calculate R & L wheel velocities based
         v_R = vel + ang_vel * self.wheel_base_width / 2
         v_L = vel - ang_vel * self.wheel_base_width / 2
 
         #print("Velocities: ", v_L, ", ", v_R)
+        self.v_L = v_L
+        self.v_R = v_R
 
         self.vc.moveVel(v_L, v_R)
 
@@ -80,6 +90,15 @@ class PoistionController:
     
     def dist_to_target(self):
         return np.sqrt((self.xtarget - self.xmeasure)**2 + (self.ytarget - self.ymeasure)**2)
+    
+    def dist_to_target_x(self):
+        return (self.xtarget - self.xmeasure)
+    
+    def dist_to_target_y(self):
+        return (self.ytarget - self.ymeasure)
+    
+    def return_plot(self):
+        return self.xmeasure, self.ymeasure
 
     def angdiff(self, th1, th2):
         # taking the difference

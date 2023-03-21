@@ -62,10 +62,23 @@ if __name__ == "__main__":
 
         timer = Timer()
 
+        # while pc.dist_to_target() > 0.1:
+        #     # Move it
+        #     pc.update(timer.elapsed())
+        #     # print("Current wheel velocity: ", pc.v_R, pc.v_L)
+        #     # print("Current angular vel:", pc.ang_vel)
+        #     print("x and y position: ", pc.xmeasure, pc.ymeasure)
+        #     timer.reset()
+        #     time.sleep(0.2)
+        
         while pc.dist_to_target() > 0.1:
             # Move it
             pc.update(timer.elapsed())
-            print("Current position: ", pc.xmeasure, ", ", pc.ymeasure)
+            if pc.dist_to_target_x() < 0.1:
+                break
+            elif pc.dist_to_target_y() < 0.1:
+                break
+            print("x and y position: ", pc.xmeasure, pc.ymeasure)
             timer.reset()
             time.sleep(0.2)
 
@@ -85,6 +98,8 @@ if __name__ == "__main__":
 
     pos_y = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 
          1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 ]
+    
+    (plot_x, plot_y) = pc.return_plot()
 
     time_vector = np.arange(0, len(pos_x), 1)
 
