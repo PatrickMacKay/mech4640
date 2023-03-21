@@ -5,7 +5,7 @@ import time
 
 from util.timer import Timer
 from plot import plot_results
-from util.position_Controller import PoistionController
+from position_Controller import PoistionController
 
 CTRL_PARAMS = "config/ctrl_params.json"
 MOTOR_PARAMS = "config/motor_params.json"

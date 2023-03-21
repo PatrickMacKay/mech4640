@@ -1,7 +1,7 @@
 import numpy as np
 from util.timer import Timer
 from motorDriver import velocityController
-from PIDController import PIDController
+from util.PIDController import PIDController
 
 class PoistionController:
     wheel_base_width = 0.095
