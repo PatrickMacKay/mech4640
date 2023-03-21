@@ -1,4 +1,5 @@
 from util.timer import Timer
+from collections import deque
 
 # This class manages a PID controller using a 
 class PIDController:
@@ -18,6 +19,7 @@ class PIDController:
     # Real-time values
     setpoint = 0
     state = 0
+    prevState = deque(maxlen=10)
     prevErr = 0
     output = 0
 
@@ -28,6 +30,7 @@ class PIDController:
         self.d_gain = d
         self.limit = limit
     
+    # Update function for PID controller, assigning the output
     def update(self, dt):
 
         # Calculate error
@@ -39,7 +42,7 @@ class PIDController:
 
         self.output = max(P + I + D, self.limit)
         self.prevErr = err
-        self.timer.reset()
+        self.prevState.append(self.state)
 
 
         
