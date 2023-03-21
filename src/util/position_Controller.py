@@ -1,6 +1,5 @@
 import numpy as np
-import timer
-from mech4640.src.motorDriver import velocityController
+from util.timer import Timer
 from motorDriver import velocityController
 from PIDController import PIDController
 
