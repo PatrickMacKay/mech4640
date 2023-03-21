@@ -57,6 +57,7 @@ class PoistionController:
         self.PIDx.state = self.xmeasure
         self.PIDy.state = self.ymeasure
         vel = np.sqrt(np.square(self.xtarget-self.xmeasure)+np.square(self.ytarget-self.ymeasure))
+        vel = max(vel, self.vel_limit)
         th_to_target = np.arctan2((self.ytarget-self.ymeasure)/(self.xtarget-self.ymeasure))
 
         ang_vel = max(self.angdiff(self.thmeasure, th_to_target), self.angvel_limit)
@@ -67,8 +68,12 @@ class PoistionController:
 
         self.vc.moveVel(v_L, v_R)
 
-
-
+    def update(self, dt):
+        self.update_pose(dt)
+        self.update_vel(dt)
+    
+    def dist_to_target(self):
+        return np.sqrt((self.xtarget - self.xmeasure)**2 + (self.ytarget - self.ymeasure)**2)
 
     def angdiff(self, th1, th2):
         # taking the difference

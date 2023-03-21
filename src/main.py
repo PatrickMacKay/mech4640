@@ -5,10 +5,13 @@ import time
 
 from util.timer import Timer
 from plot import plot_results
+from util.position_Controller import PoistionController
 
 CTRL_PARAMS = "config/ctrl_params.json"
 MOTOR_PARAMS = "config/motor_params.json"
-WAYPOINTS_FILE = "config/waypoints.json"
+
+#WAYPOINTS_FILE = "config/waypoints.json"
+WAYPOINTS_FILE = "config/one_waypoint.json"
 
 # Entry point
 if __name__ == "__main__":
@@ -48,7 +51,22 @@ if __name__ == "__main__":
         theta_setpoint = math.radians(wp["yaw"])
 
         # Keep asking the position controller if we're there yet.
+        pc = PoistionController(
+            1, # p,
+            1, # i,
+            1, # d
+            x_setpoint,
+            y_setpoint,
+            theta_setpoint
+        )
 
+        timer = Timer()
+
+        while pc.dist_to_target > 0.03:
+            # Move it
+            pc.update(timer.elapsed())
+            timer.reset()
+            time.sleep(0.2)
 
         # If there is a pause, wait for the specified period.
         if "pause" in wp:
