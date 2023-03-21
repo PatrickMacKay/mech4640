@@ -61,9 +61,13 @@ class PoistionController:
 
         ang_vel = max(self.angdiff(self.thmeasure, th_to_target), self.angvel_limit)
 
+        # calculate R & L wheel velocities based
+        v_R = vel + ang_vel * self.wheel_base_width / 2
+        v_L = vel - ang_vel * self.wheel_base_width / 2
 
-        self.PIDx.update(dt)
-        self.PIDy.update(dt)
+        self.vc.moveVel(v_L, v_R)
+
+
 
 
     def angdiff(self, th1, th2):
