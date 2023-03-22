@@ -11,7 +11,7 @@ CTRL_PARAMS = "config/ctrl_params.json"
 #MOTOR_PARAMS = "config/motor_params.json"
 
 #WAYPOINTS_FILE = "config/waypoints.json"
-WAYPOINTS_FILE = "config/one_waypoint.json"
+WAYPOINTS_FILE = "config/waypoints.json"
 
 # Entry point
 if __name__ == "__main__":
@@ -45,42 +45,48 @@ if __name__ == "__main__":
     # Run Waypoints #
     #################
 
+    # start position controller
+    pc = PoistionController(
+            1, # p,
+            1, # i,
+            1 # d
+        )
+
+
     for wp in waypoints:
         x_setpoint = wp["pos"][0]
         y_setpoint = wp["pos"][1]
         theta_setpoint = math.radians(wp["yaw"])
 
-        # Keep asking the position controller if we're there yet.
-        pc = PoistionController(
-            1, # p,
-            1, # i,
-            1, # d
-            x_setpoint,
-            y_setpoint,
-            theta_setpoint
-        )
+        pc.set_new_waypoint(x_setpoint, y_setpoint, theta_setpoint)
 
+        # Keep asking the position controller if we're there yet.
+        
         timer = Timer()
 
-        # while pc.dist_to_target() > 0.1:
-        #     # Move it
-        #     pc.update(timer.elapsed())
-        #     # print("Current wheel velocity: ", pc.v_R, pc.v_L)
-        #     # print("Current angular vel:", pc.ang_vel)
-        #     print("x and y position: ", pc.xmeasure, pc.ymeasure)
-        #     timer.reset()
-        #     time.sleep(0.2)
-        
         while pc.dist_to_target() > 0.1:
             # Move it
             pc.update(timer.elapsed())
-            if pc.dist_to_target_x() < 0.1:
-                break
-            elif pc.dist_to_target_y() < 0.1:
-                break
-            print("x and y position: ", pc.xmeasure, pc.ymeasure)
+            
+            # print("Current angular vel:", pc.ang_vel)
+            print("x y th: ", pc.xmeasure, pc.ymeasure, math.degrees(pc.thmeasure))
+            print("Current wheel velocity: ", pc.v_R, pc.v_L)
             timer.reset()
             time.sleep(0.2)
+
+        # stop wheels after moving
+        pc.vel_stop()
+        
+        # while pc.dist_to_target() > 0.1:
+        #     # Move it
+        #     pc.update(timer.elapsed())
+        #     if pc.dist_to_target_x() < 0.1:
+        #         break
+        #     elif pc.dist_to_target_y() < 0.1:
+        #         break
+        #     print("x and y position: ", pc.xmeasure, pc.ymeasure)
+        #     timer.reset()
+        #     time.sleep(0.2)
 
         # If there is a pause, wait for the specified period.
         if "pause" in wp:

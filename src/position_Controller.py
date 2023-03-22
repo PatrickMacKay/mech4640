@@ -9,37 +9,33 @@ def clamp(n, smallest, largest):
 class PoistionController:
     wheel_base_width = 0.095
 
-    def __init__(self, p = 1, i = 1, d = 1, xtarget = 0, ytarget = 0, thtarget = 0):
+    def __init__(self, p = 1, i = 1, d = 1):
         self.p = p
         self.i = i
         self.d = d
 
-        self.k_omega = 80
+        self.k_omega = 40
+        self.k_vel = 0.3
 
         self.vel_limit = 0.1 # m/s
-        self.angvel_limit = 20 # m/s
-        self.xtarget = xtarget
-        self.ytarget = ytarget
-        self.thtarget = thtarget
+        self.angvel_limit = 0.2 # rad/s
 
         # initialize velocity controller
         self.vc = velocityController()
 
-        # set PID values
-        self.PIDvel = PIDController(p, i, d, 1)
-        self.PIDth = PIDController(p, i, d, 1)
-        self.PIDvel.setpoint = np.sqrt(np.square(self.xtarget)+np.square(self.ytarget))
-        self.PIDth.setpoint = self.ytarget
-
         self.v_R = 0
         self.v_L = 0
-        self.ang_vel = 0
         self.xmeasure = 0
         self.ymeasure = 0
         self.thmeasure = 0
         self.x_array = []
         self.y_array = []
         self.th_array = []
+
+    def set_new_waypoint(self, xtarget = 0, ytarget = 0, thtarget = 0):
+        self.xtarget = xtarget
+        self.ytarget = ytarget
+        self.thtarget = thtarget
 
     def update_pose(self, dt):
         # get updates from velocity controller
@@ -61,18 +57,15 @@ class PoistionController:
 
     def update_vel(self, dt):
         # based on current and target position, update velocity
-        #self.PIDx.state = self.xmeasure
-        #self.PIDy.state = self.ymeasure
-        vel = np.sqrt(np.square(self.xtarget-self.xmeasure)+np.square(self.ytarget-self.ymeasure))
-        #vel = max(vel, self.vel_limit)
+        vel = self.k_vel * np.sqrt(np.square(self.xtarget-self.xmeasure)+np.square(self.ytarget-self.ymeasure))
         vel = clamp(vel, 0, self.vel_limit)
         th_to_target = np.arctan2(self.ytarget - self.ymeasure, self.xtarget - self.xmeasure)
+
         # print("th measured", self.thmeasure)
         ang_vel = self.k_omega * self.angdiff(th_to_target, self.thmeasure)
-        ang_vel = clamp(ang_vel, 0, self.angvel_limit)
+        ang_vel = clamp(ang_vel, -self.angvel_limit, self.angvel_limit)
         print("angular vel ", ang_vel)
-
-        self.ang_vel = ang_vel
+        print("linear vel: ", vel)
 
         # calculate R & L wheel velocities based
         v_R = vel + ang_vel * self.wheel_base_width / 2
@@ -88,6 +81,9 @@ class PoistionController:
         self.update_pose(dt)
         self.update_vel(dt)
     
+    def vel_stop(self):
+        self.vc.moveVel(0, 0)
+
     def dist_to_target(self):
         return np.sqrt((self.xtarget - self.xmeasure)**2 + (self.ytarget - self.ymeasure)**2)
     

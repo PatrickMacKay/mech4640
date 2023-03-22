@@ -26,7 +26,7 @@ def plot(time_vector, pos_x, pos_y):
         velocities[i] = velocities[i] + np.random.normal(-0.1, 0.1)
 
     # x over time
-    fig1 = plt.figure()
+    # fig1 = plt.figure()
     plt.plot(time_vector, pos_x, label = 'x')
     plt.plot(time_vector, pos_x, label = 'x')
     plt.title("x position vs time")
