@@ -14,8 +14,8 @@ class PoistionController:
         self.i = i
         self.d = d
 
-        self.k_omega = 10
-        self.k_vel = 0.3
+        self.k_omega = 0.3
+        self.k_vel = 0.2
 
         self.vel_limit = 0.1 # m/s
         self.angvel_limit = 0.2 # rad/s
@@ -80,6 +80,10 @@ class PoistionController:
     def update(self, dt):
         self.update_pose(dt)
         self.update_vel(dt)
+    
+    def update_turning(self, dt):
+        self.update_pose(dt)
+        self.turn_to_th_target(dt)
 
     def turn_to_th_target(self, dt):
         # print("th measured", self.thmeasure)

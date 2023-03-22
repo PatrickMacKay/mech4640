@@ -84,7 +84,7 @@ if __name__ == "__main__":
         print("TURNING TO TH TARGET")
         print(pc.th_to_target())
         while pc.th_to_target() > 0.1:
-            pc.turn_to_th_target(timer.elapsed())
+            pc.update_turning(timer.elapsed())
             print("x y th: ", pc.xmeasure, pc.ymeasure, math.degrees(pc.thmeasure))
             print("Current wheel velocity: ", pc.v_R, pc.v_L)
             timer.reset()
