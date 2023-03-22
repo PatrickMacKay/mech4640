@@ -57,6 +57,7 @@ if __name__ == "__main__":
         x_setpoint = wp["pos"][0]
         y_setpoint = wp["pos"][1]
         theta_setpoint = math.radians(wp["yaw"])
+        print("theta_setpoint ", theta_setpoint)
 
         pc.set_new_waypoint(x_setpoint, y_setpoint, theta_setpoint)
 
@@ -64,7 +65,8 @@ if __name__ == "__main__":
         
         timer = Timer()
 
-        while pc.dist_to_target() > 0.1:
+        # move towards target position
+        while pc.dist_to_target() > 0.15:
             # Move it
             pc.update(timer.elapsed())
             
@@ -76,6 +78,19 @@ if __name__ == "__main__":
 
         # stop wheels after moving
         pc.vel_stop()
+
+        # turn to target theta direction
+        timer.reset()
+        print("TURNING TO TH TARGET")
+        print(pc.th_to_target())
+        while pc.th_to_target() > 0.1:
+            pc.turn_to_th_target(timer.elapsed())
+            print("x y th: ", pc.xmeasure, pc.ymeasure, math.degrees(pc.thmeasure))
+            print("Current wheel velocity: ", pc.v_R, pc.v_L)
+            timer.reset()
+            time.sleep(0.2)
+
+        print("WAYPOINT REACHED")
         
         # while pc.dist_to_target() > 0.1:
         #     # Move it

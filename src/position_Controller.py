@@ -14,7 +14,7 @@ class PoistionController:
         self.i = i
         self.d = d
 
-        self.k_omega = 40
+        self.k_omega = 10
         self.k_vel = 0.3
 
         self.vel_limit = 0.1 # m/s
@@ -59,17 +59,17 @@ class PoistionController:
         # based on current and target position, update velocity
         vel = self.k_vel * np.sqrt(np.square(self.xtarget-self.xmeasure)+np.square(self.ytarget-self.ymeasure))
         vel = clamp(vel, 0, self.vel_limit)
-        th_to_target = np.arctan2(self.ytarget - self.ymeasure, self.xtarget - self.xmeasure)
+        th_to_xytarget = np.arctan2(self.ytarget - self.ymeasure, self.xtarget - self.xmeasure)
 
         # print("th measured", self.thmeasure)
-        ang_vel = self.k_omega * self.angdiff(th_to_target, self.thmeasure)
+        ang_vel = self.k_omega * self.angdiff(th_to_xytarget, self.thmeasure)
         ang_vel = clamp(ang_vel, -self.angvel_limit, self.angvel_limit)
         print("angular vel ", ang_vel)
-        print("linear vel: ", vel)
+        # print("linear vel: ", vel)
 
         # calculate R & L wheel velocities based
-        v_R = vel + ang_vel * self.wheel_base_width / 2
-        v_L = vel - ang_vel * self.wheel_base_width / 2
+        v_R = vel + (ang_vel * self.wheel_base_width / 2)
+        v_L = vel - (ang_vel * self.wheel_base_width / 2)
 
         #print("Velocities: ", v_L, ", ", v_R)
         self.v_L = v_L
@@ -80,6 +80,19 @@ class PoistionController:
     def update(self, dt):
         self.update_pose(dt)
         self.update_vel(dt)
+
+    def turn_to_th_target(self, dt):
+        # print("th measured", self.thmeasure)
+        ang_vel = self.k_omega * self.th_to_target()
+        ang_vel = clamp(ang_vel, -self.angvel_limit, self.angvel_limit)
+        print("angular vel ", ang_vel)
+        # print("linear vel: ", vel)
+
+        # calculate R & L wheel velocities based
+        v_R = (ang_vel * self.wheel_base_width / 2)
+        v_L = -(ang_vel * self.wheel_base_width / 2)
+
+        self.vc.moveVel(v_L, v_R)
     
     def vel_stop(self):
         self.vc.moveVel(0, 0)
@@ -95,8 +108,15 @@ class PoistionController:
     
     def return_plot(self):
         return self.xmeasure, self.ymeasure
+    
+    def th_to_target(self):
+        return self.angdiff(self.thtarget, self.thmeasure)
+
 
     def angdiff(self, th1, th2):
+        # changing input values to degrees
+        th1 = np.degrees(th1)
+        th2 = np.degrees(th2)
         # taking the difference
         diff = th1 - th2
 
@@ -116,6 +136,6 @@ class PoistionController:
             diff = -(360-diff)
 
         # transform to radians for answer
-        diff_rad = diff * np.pi/180
+        diff_rad = np.radians(diff)
 
         return diff_rad
