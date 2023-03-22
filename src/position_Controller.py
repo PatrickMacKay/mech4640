@@ -15,10 +15,10 @@ class PoistionController:
         self.d = d
 
         self.k_omega = 0.3
-        self.k_vel = 0.2
+        self.k_vel = 0.1
 
-        self.vel_limit = 0.1 # m/s
-        self.angvel_limit = 0.2 # rad/s
+        self.vel_limit = 0.2 # m/s
+        self.angvel_limit = 0.1 # rad/s
 
         # initialize velocity controller
         self.vc = velocityController()
@@ -51,6 +51,7 @@ class PoistionController:
         y_delta = 0.5*(r_vel + l_vel) * np.sin(self.thmeasure) * dt
         #update measured position
         self.thmeasure = self.thmeasure + th_delta
+        self.thmeasure = self.normalize_theta(self.thmeasure)
         self.xmeasure = self.xmeasure + x_delta
         self.ymeasure = self.ymeasure + y_delta
 
@@ -115,6 +116,14 @@ class PoistionController:
     
     def th_to_target(self):
         return self.angdiff(self.thtarget, self.thmeasure)
+
+    # not sure this is actually needed
+    def normalize_theta(self, theta):
+        while theta > np.pi:
+            theta -= 2*np.pi
+        while theta < -np.pi:
+            theta += 2*np.pi
+        return theta
 
 
     def angdiff(self, th1, th2):

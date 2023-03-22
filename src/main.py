@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import json
 import os
 import math
@@ -36,7 +37,11 @@ if __name__ == "__main__":
     with open(wp_path) as wp_file:
         waypoints = json.loads(wp_file.read())
 
-    # Initialize position controller
+    # create live plot
+    fig1 = plt.figure()
+    plt.title("x vs y position")
+    plt.xlabel("X")
+    plt.ylabel("Y")
 
     # Print initialization time
     print("Initialization completed in %1.2f seconds" %init_timer.elapsed())
@@ -66,15 +71,15 @@ if __name__ == "__main__":
         timer = Timer()
 
         # move towards target position
-        while pc.dist_to_target() > 0.15:
+        while pc.dist_to_target() > 0.1:
             # Move it
             pc.update(timer.elapsed())
-            
-            # print("Current angular vel:", pc.ang_vel)
+            timer.reset()
+            plt.plot(pc.xmeasure, pc.ymeasure)
+            plt.show()
             print("x y th: ", pc.xmeasure, pc.ymeasure, math.degrees(pc.thmeasure))
             print("Current wheel velocity: ", pc.v_R, pc.v_L)
-            timer.reset()
-            time.sleep(0.2)
+            time.sleep(0.1)
 
         # stop wheels after moving
         pc.vel_stop()
@@ -83,12 +88,14 @@ if __name__ == "__main__":
         timer.reset()
         print("TURNING TO TH TARGET")
         print(pc.th_to_target())
+
+
         while pc.th_to_target() > 0.1:
             pc.update_turning(timer.elapsed())
+            timer.reset()
             print("x y th: ", pc.xmeasure, pc.ymeasure, math.degrees(pc.thmeasure))
             print("Current wheel velocity: ", pc.v_R, pc.v_L)
-            timer.reset()
-            time.sleep(0.2)
+            time.sleep(0.1)
 
         print("WAYPOINT REACHED")
         
