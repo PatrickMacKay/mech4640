@@ -6,29 +6,40 @@ from util.PIDController import PIDController
 def clamp(n, smallest, largest):
     return max(smallest, min(n, largest))
 
-class PoistionController:
+class PositionController:
     wheel_base_width = 0.095
 
-    def __init__(self, p = 1, i = 1, d = 1):
-        self.p = p
-        self.i = i
-        self.d = d
+    def __init__(self, vel_params, ang_vel_params):
 
-        self.k_omega = 0.1
-        self.k_vel = 0.1
+        # Initialize PID Controllers with parameters (p, i, d, lim)
+        self.vel_pid = PIDController(
+            vel_params["p_gain"],
+            vel_params["i_gain"],
+            vel_params["d_gain"],
+            vel_params["limit"]
+        )
+        self.vel_pid.setpoint = 0
+        self.angvel_pid = PIDController(
+            ang_vel_params["p_gain"],
+            ang_vel_params["i_gain"],
+            ang_vel_params["d_gain"],
+            ang_vel_params["limit"]
+        )
+        self.angvel_pid.setpoint = 0
 
-        self.vel_limit = 0.2 # m/s
-        self.angvel_limit = 0.1 # rad/s
-
-        # initialize velocity controller
+        # Initialize velocity controller
         self.vc = velocityController()
 
+        # Wheel Velocities
         self.v_R = 0
         self.v_L = 0
+
+        # Current position measurement
         self.xmeasure = 0
         self.ymeasure = 0
         self.thmeasure = 0
 
+        # Cumulative values
         self.elapsed_time = 0
         self.time_array = []
         self.x_array = []
@@ -41,19 +52,22 @@ class PoistionController:
         self.thtarget = thtarget
 
     def update_pose(self, dt):
-        # get updates from velocity controller
+        # Update velocity controller
         l_sig, r_sig, l_time, r_time, l_vel, r_vel, l_enc, r_enc = self.vc.update()
-        # add previous calculation to array for plotting
+
+        # Add to cumulative arrays
         self.elapsed_time += dt
         self.time_array.append(self.elapsed_time)
         self.x_array.append(self.xmeasure)
         self.y_array.append(self.ymeasure)
         self.th_array.append(self.thmeasure)
-        # calculate position delta based on encoder values
+
+        # Calculate position delta based on encoder values
         th_delta = (r_vel - l_vel) / self.wheel_base_width * dt
         x_delta = 0.5*(r_vel + l_vel) * np.cos(self.thmeasure) * dt
         y_delta = 0.5*(r_vel + l_vel) * np.sin(self.thmeasure) * dt
-        #update measured position
+
+        # Update current measured position
         self.thmeasure = self.thmeasure + th_delta
         self.thmeasure = self.normalize_theta(self.thmeasure)
         self.xmeasure = self.xmeasure + x_delta
@@ -61,21 +75,22 @@ class PoistionController:
 
 
     def update_vel(self, dt):
-        # based on current and target position, update velocity
-        vel = self.k_vel * np.sqrt(np.square(self.xtarget-self.xmeasure)+np.square(self.ytarget-self.ymeasure))
-        vel = clamp(vel, 0, self.vel_limit)
-        th_to_xytarget = np.arctan2(self.ytarget - self.ymeasure, self.xtarget - self.xmeasure)
 
-        # print("th measured", self.thmeasure)
-        ang_vel = self.k_omega * self.angdiff(th_to_xytarget, self.thmeasure)
-        ang_vel = clamp(ang_vel, -self.angvel_limit, self.angvel_limit)
-        #print("angular vel ", ang_vel)
-        # print("linear vel: ", vel)
+        # Calculate error for vel and angvel and set as setpoint.
+        # Update PID controllers with measurements
+        self.vel_pid.state = np.sqrt(np.square(self.xtarget-self.xmeasure)+np.square(self.ytarget-self.ymeasure))
+        self.angvel_pid.state = np.arctan2(self.ytarget - self.ymeasure, self.xtarget - self.xmeasure)
+        self.vel_pid.update(dt)
+        self.angvel_pid.update(dt)
 
-        # calculate R & L wheel velocities based
+        vel = self.vel_pid.output
+        ang_vel = self.angvel_pid.output
+
+        # Assign velocities with direction of angvel
         v_R = vel + (ang_vel * self.wheel_base_width / 2)
         v_L = vel - (ang_vel * self.wheel_base_width / 2)
 
+        # Do not write unless the velocities are different
         if self.v_L != v_L and self.v_R != v_R:
             self.vc.moveVel(v_L, v_R)
             self.v_L = v_L
@@ -91,11 +106,11 @@ class PoistionController:
         self.turn_to_th_target(dt)
 
     def turn_to_th_target(self, dt):
-        # print("th measured", self.thmeasure)
-        ang_vel = self.k_omega * self.th_to_target()
-        ang_vel = clamp(ang_vel, -self.angvel_limit, self.angvel_limit)
-        print("angular vel ", ang_vel)
-        # print("linear vel: ", vel)
+
+        # Update PID controller
+        self.angvel_pid.state = self.th_to_target()
+        self.angvel_pid.update()
+        ang_vel = self.angvel_pid.output
 
         # calculate R & L wheel velocities based
         v_R = (ang_vel * self.wheel_base_width / 2)

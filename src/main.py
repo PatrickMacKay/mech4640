@@ -6,7 +6,7 @@ import time
 
 from util.timer import Timer
 from plot import plot_results, LivePlotter
-from position_Controller import PoistionController
+from positioncontroller import PositionController
 
 CTRL_PARAMS = "config/ctrl_params.json"
 #MOTOR_PARAMS = "config/motor_params.json"
@@ -46,12 +46,8 @@ if __name__ == "__main__":
     # Run Waypoints #
     #################
 
-    # Initialize position controller
-    pc = PoistionController(
-            1, # p,
-            1, # i,
-            1 # d
-        )
+    # Initialize position controller with config params
+    pc = PositionController(cp_json["vel"], cp_json["ang_vel"])
 
     # Iterate through each waypoint
     for wp in waypoints:
@@ -83,7 +79,6 @@ if __name__ == "__main__":
         print("TURNING TO TH TARGET")
         print(pc.th_to_target())
 
-
         while pc.th_to_target() > 0.1:
             pc.update_turning(timer.elapsed())
             timer.reset()
@@ -95,7 +90,6 @@ if __name__ == "__main__":
         # If there is a pause, wait for the specified period.
         if "pause" in wp:
             time.sleep(wp["pause"])
-        # Iterate through all waypoints
     
     ########
     # Plot #

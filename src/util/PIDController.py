@@ -1,5 +1,8 @@
 from util.timer import Timer
 
+def clamp(n, smallest, largest):
+    return max(smallest, min(n, largest))
+
 # This class manages a PID controller using a 
 class PIDController:
 
@@ -37,7 +40,7 @@ class PIDController:
         I = self.i_gain * err * dt
         D = self.d_gain * (err - self.prevErr) / dt
 
-        self.output = max(P + I + D, self.limit)
+        self.output = clamp(P + I + D, -self.limit, self.limit)
         self.prevErr = err
         self.timer.reset()
 

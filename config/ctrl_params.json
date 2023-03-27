@@ -1,26 +1,14 @@
 {
-    "x-position": {
-        "p_gain": 1,
-        "i_gain": 1,
+    "vel": {
+        "p_gain": 0.1,
+        "i_gain": 0,
         "d_gain": 0,
-        "limit": 0.4
+        "limit": 0.2
     },
-    "y-position": {
-        "p_gain": 1,
-        "i_gain": 1,
+    "ang_vel": {
+        "p_gain": 0.1,
+        "i_gain": 0,
         "d_gain": 0,
-        "limit": 0.4
-    },
-    "x-velocity": {
-        "p_gain": 1,
-        "i_gain": 1,
-        "d_gain": 0,
-        "limit": 0.4
-    },
-    "y-velocity": {
-        "p_gain": 1,
-        "i_gain": 1,
-        "d_gain": 0,
-        "limit": 0.4
+        "limit": 0.1
     }
 }
