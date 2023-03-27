@@ -6,7 +6,7 @@ import time
 import signal
 
 from util.timer import Timer
-from plot import plot_results, LivePlotter
+from plot import plotter
 from position_Controller import PositionController
 
 CTRL_PARAMS = "config/ctrl_params.json"
@@ -23,10 +23,16 @@ if __name__ == "__main__":
     # Initialize Config #
     #####################
 
+    # initialize plotter
+    plot = plotter()
+
+    # create dir for plots
+    plot.create_plot_dir()
+
     # intializing signal interupt handler
     def signal_handler(*args):
         pc.vel_stop()
-        plot_results(pc.time_array, pc.x_array, pc.y_array)
+        plot.plot_results(pc.time_array, pc.x_array, pc.y_array)
 
     signal.signal(signal.SIGINT, signal_handler)
 
@@ -45,7 +51,7 @@ if __name__ == "__main__":
         waypoints = json.loads(wp_file.read())
 
     # Initialize Live Plot
-    live_plt = LivePlotter()
+    # live_plt = LivePlotter()
 
     # Print initialization time
     print("Initialization completed in %1.2f seconds" %init_timer.elapsed())
@@ -80,8 +86,6 @@ if __name__ == "__main__":
             print("x y th: ", pc.xmeasure, pc.ymeasure, math.degrees(pc.thmeasure))
             print("Current wheel velocity: ", pc.v_R, pc.v_L)
 
-            # Update plot
-            live_plt.update(pc.x_array, pc.y_array)
 
         # stop wheels after moving
         pc.vel_stop()
@@ -121,7 +125,7 @@ if __name__ == "__main__":
 
     time_vector = np.arange(0, len(pos_x), 1)
 
-    plot_results(time_vector, pos_x, pos_y)
+    plot.plot_results(time_vector, pos_x, pos_y)
 
 
     # Complete!
