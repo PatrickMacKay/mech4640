@@ -3,10 +3,11 @@ import json
 import os
 import math
 import time
+import signal
 
 from util.timer import Timer
 from plot import plot_results, LivePlotter
-from position_Controller import PoistionController
+from position_Controller import PositionController
 
 CTRL_PARAMS = "config/ctrl_params.json"
 #MOTOR_PARAMS = "config/motor_params.json"
@@ -21,6 +22,12 @@ if __name__ == "__main__":
     #####################
     # Initialize Config #
     #####################
+
+    # intializing signal interupt handler
+    def signal_handler(*args):
+        plot_results(pc.time_array, pc.x_array, pc.y_array)
+
+    signal.signal(signal.SIGINT, signal_handler)
 
     dirname = os.path.dirname(__file__)
     dirname = os.path.join(dirname, "../")
@@ -47,7 +54,7 @@ if __name__ == "__main__":
     #################
 
     # Initialize position controller
-    pc = PoistionController(
+    pc = PositionController(
             1, # p,
             1, # i,
             1 # d

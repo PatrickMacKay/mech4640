@@ -6,7 +6,7 @@ from util.PIDController import PIDController
 def clamp(n, smallest, largest):
     return max(smallest, min(n, largest))
 
-class PoistionController:
+class PositionController:
     wheel_base_width = 0.095
 
     def __init__(self, p = 1, i = 1, d = 1):
