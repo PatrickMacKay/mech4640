@@ -25,6 +25,7 @@ if __name__ == "__main__":
 
     # intializing signal interupt handler
     def signal_handler(*args):
+        pc.vel_stop()
         plot_results(pc.time_array, pc.x_array, pc.y_array)
 
     signal.signal(signal.SIGINT, signal_handler)
