@@ -5,13 +5,12 @@ import math
 import time
 
 from util.timer import Timer
-from plot import plot_results
+from plot import plot_results, LivePlotter
 from position_Controller import PoistionController
 
 CTRL_PARAMS = "config/ctrl_params.json"
 #MOTOR_PARAMS = "config/motor_params.json"
 
-#WAYPOINTS_FILE = "config/waypoints.json"
 WAYPOINTS_FILE = "config/waypoints.json"
 
 # Entry point
@@ -37,11 +36,8 @@ if __name__ == "__main__":
     with open(wp_path) as wp_file:
         waypoints = json.loads(wp_file.read())
 
-    # create live plot
-    fig1 = plt.figure()
-    plt.title("x vs y position")
-    plt.xlabel("X")
-    plt.ylabel("Y")
+    # Initialize Live Plot
+    live_plt = LivePlotter()
 
     # Print initialization time
     print("Initialization completed in %1.2f seconds" %init_timer.elapsed())
@@ -50,14 +46,14 @@ if __name__ == "__main__":
     # Run Waypoints #
     #################
 
-    # start position controller
+    # Initialize position controller
     pc = PoistionController(
             1, # p,
             1, # i,
             1 # d
         )
 
-
+    # Iterate through each waypoint
     for wp in waypoints:
         x_setpoint = wp["pos"][0]
         y_setpoint = wp["pos"][1]
@@ -65,21 +61,19 @@ if __name__ == "__main__":
         print("theta_setpoint ", theta_setpoint)
 
         pc.set_new_waypoint(x_setpoint, y_setpoint, theta_setpoint)
-
-        # Keep asking the position controller if we're there yet.
         
         timer = Timer()
 
-        # move towards target position
+        # Keep asking the position controller if we're there yet.
         while pc.dist_to_target() > 0.1:
             # Move it
             pc.update(timer.elapsed())
             timer.reset()
-            plt.plot(pc.xmeasure, pc.ymeasure)
-            plt.show()
             print("x y th: ", pc.xmeasure, pc.ymeasure, math.degrees(pc.thmeasure))
             print("Current wheel velocity: ", pc.v_R, pc.v_L)
-            time.sleep(0.1)
+
+            # Update plot
+            live_plt.update(pc.time_array ,pc.x_array, pc.y_array)
 
         # stop wheels after moving
         pc.vel_stop()
@@ -95,7 +89,6 @@ if __name__ == "__main__":
             timer.reset()
             print("x y th: ", pc.xmeasure, pc.ymeasure, math.degrees(pc.thmeasure))
             print("Current wheel velocity: ", pc.v_R, pc.v_L)
-            time.sleep(0.1)
 
         print("WAYPOINT REACHED")
         

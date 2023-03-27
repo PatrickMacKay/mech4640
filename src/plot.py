@@ -2,22 +2,24 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits import mplot3d
 
+class LivePlotter:
+    fig, ax = plt.subplots()
+    plot = ax.scatter([], [])
+
+    def update(self, time_vec, x_pos, y_pos):
+        self.plot.set_offsets(x_pos, y_pos)
+        self.fig.canvas.draw()
+        plt.pause(0.05)
+
+
+
 # Plotting requires three vectors of the same length.
 def plot_results(time_vec, x_pos, y_pos):
     # Plot some stuff
     print("Plotting results")
-    plot(time_vec, x_pos, y_pos)
+    finished_plots(time_vec, x_pos, y_pos)
 
-
-pos_x = [ 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 
-         0.5, 0.4, 0.3, 0.2, 0.1, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
-
-pos_y = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 
-         1.0, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0 ]
-
-time_vector = np.arange(0, len(pos_x), 1)
-
-def plot(time_vector, pos_x, pos_y):
+def finished_plots(time_vector, pos_x, pos_y):
 
     print("Plotting {} samples", len(pos_x))
 

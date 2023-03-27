@@ -28,6 +28,8 @@ class PoistionController:
         self.xmeasure = 0
         self.ymeasure = 0
         self.thmeasure = 0
+
+        self.time_array = []
         self.x_array = []
         self.y_array = []
         self.th_array = []
@@ -41,8 +43,8 @@ class PoistionController:
         # get updates from velocity controller
         l_sig, r_sig, l_time, r_time, l_vel, r_vel, l_enc, r_enc = self.vc.update()
         # add current calculation to array for plotting
+        self.time_array.append(self.dt + self.time_array[-1]) # -1 returns the last element
         self.x_array.append(self.xmeasure)
-
         self.y_array.append(self.ymeasure)
         self.th_array.append(self.thmeasure)
         # calculate position delta based on encoder values
