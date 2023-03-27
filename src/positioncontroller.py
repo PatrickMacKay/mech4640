@@ -133,11 +133,12 @@ class PositionController:
         return self.xmeasure, self.ymeasure
     
     def th_to_target(self):
-        return self.angdiff(self.thtarget, self.thmeasure)
+        diff = self.thtarget - self.thmeasure
+        return self.normalize_theta(diff)
     
     def th_outside_margin(self, margin):
-        diff = self.angdiff(self.thtarget, self.thmeasure)
-        return diff > margin and diff < -margin
+        diff = self.th_to_target()
+        return diff > margin or diff < -margin
 
     # not sure this is actually needed
     def normalize_theta(self, theta):

@@ -28,7 +28,7 @@ if __name__ == "__main__":
         pc.vel_stop()
         plot_results(pc.time_array, pc.x_array, pc.y_array)
 
-    signal.signal(signal.SIGINT, signal_handler)
+    #signal.signal(signal.SIGINT, signal_handler)
 
     dirname = os.path.dirname(__file__)
     dirname = os.path.join(dirname, "../")
@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
     # Iterate through each waypoint
     for wp in waypoints:
-        print("Moving to waypoint ", wp)
+        print("MOVING TO WAYPOINT ", wp)
         x_setpoint = wp["pos"][0]
         y_setpoint = wp["pos"][1]
         theta_setpoint = math.radians(wp["yaw"])
@@ -75,16 +75,18 @@ if __name__ == "__main__":
 
             # Update plot
             live_plt.update(pc.x_array, pc.y_array)
+            time.sleep(0.05)
 
         # stop wheels after moving
         pc.vel_stop()
 
         # turn to target theta direction
-        timer.reset()
-        print("TURNING TO TH TARGET", pc.th_to_target() * 57.29, " degrees")
+        print("TURNING TO TH TARGET", pc.th_to_target(), " radians")
 
+        timer.reset()
         while pc.th_outside_margin(0.05):
             pc.update_turning(timer.elapsed())
+            print("th = ", pc.th_to_target(), "\r")
             timer.reset()
 
         print("WAYPOINT REACHED")
