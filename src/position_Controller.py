@@ -14,7 +14,7 @@ class PoistionController:
         self.i = i
         self.d = d
 
-        self.k_omega = 0.3
+        self.k_omega = 0.1
         self.k_vel = 0.1
 
         self.vel_limit = 0.2 # m/s
@@ -29,6 +29,7 @@ class PoistionController:
         self.ymeasure = 0
         self.thmeasure = 0
 
+        self.elapsed_time = 0
         self.time_array = []
         self.x_array = []
         self.y_array = []
@@ -42,8 +43,9 @@ class PoistionController:
     def update_pose(self, dt):
         # get updates from velocity controller
         l_sig, r_sig, l_time, r_time, l_vel, r_vel, l_enc, r_enc = self.vc.update()
-        # add current calculation to array for plotting
-        self.time_array.append(self.dt + self.time_array[-1]) # -1 returns the last element
+        # add previous calculation to array for plotting
+        self.elapsed_time += dt
+        self.time_array.append(self.elapsed_time)
         self.x_array.append(self.xmeasure)
         self.y_array.append(self.ymeasure)
         self.th_array.append(self.thmeasure)
@@ -67,18 +69,18 @@ class PoistionController:
         # print("th measured", self.thmeasure)
         ang_vel = self.k_omega * self.angdiff(th_to_xytarget, self.thmeasure)
         ang_vel = clamp(ang_vel, -self.angvel_limit, self.angvel_limit)
-        print("angular vel ", ang_vel)
+        #print("angular vel ", ang_vel)
         # print("linear vel: ", vel)
 
         # calculate R & L wheel velocities based
         v_R = vel + (ang_vel * self.wheel_base_width / 2)
         v_L = vel - (ang_vel * self.wheel_base_width / 2)
 
-        #print("Velocities: ", v_L, ", ", v_R)
-        self.v_L = v_L
-        self.v_R = v_R
+        if self.v_L != v_L and self.v_R != v_R:
+            self.vc.moveVel(v_L, v_R)
+            self.v_L = v_L
+            self.v_R = v_R
 
-        self.vc.moveVel(v_L, v_R)
 
     def update(self, dt):
         self.update_pose(dt)

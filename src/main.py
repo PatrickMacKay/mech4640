@@ -73,7 +73,7 @@ if __name__ == "__main__":
             print("Current wheel velocity: ", pc.v_R, pc.v_L)
 
             # Update plot
-            live_plt.update(pc.time_array ,pc.x_array, pc.y_array)
+            live_plt.update(pc.x_array, pc.y_array)
 
         # stop wheels after moving
         pc.vel_stop()
@@ -91,17 +91,6 @@ if __name__ == "__main__":
             print("Current wheel velocity: ", pc.v_R, pc.v_L)
 
         print("WAYPOINT REACHED")
-        
-        # while pc.dist_to_target() > 0.1:
-        #     # Move it
-        #     pc.update(timer.elapsed())
-        #     if pc.dist_to_target_x() < 0.1:
-        #         break
-        #     elif pc.dist_to_target_y() < 0.1:
-        #         break
-        #     print("x and y position: ", pc.xmeasure, pc.ymeasure)
-        #     timer.reset()
-        #     time.sleep(0.2)
 
         # If there is a pause, wait for the specified period.
         if "pause" in wp:

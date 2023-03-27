@@ -5,9 +5,10 @@ from mpl_toolkits import mplot3d
 class LivePlotter:
     fig, ax = plt.subplots()
     plot = ax.scatter([], [])
+    plt.draw()
 
-    def update(self, time_vec, x_pos, y_pos):
-        self.plot.set_offsets(x_pos, y_pos)
+    def update(self, x_pos, y_pos):
+        self.plot = self.ax.scatter(x_pos, y_pos)
         self.fig.canvas.draw()
         plt.pause(0.05)
 
