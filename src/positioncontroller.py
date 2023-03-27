@@ -106,10 +106,9 @@ class PositionController:
         self.turn_to_th_target(dt)
 
     def turn_to_th_target(self, dt):
-
         # Update PID controller
         self.angvel_pid.state = self.th_to_target()
-        self.angvel_pid.update()
+        self.angvel_pid.update(dt)
         ang_vel = self.angvel_pid.output
 
         # calculate R & L wheel velocities based
@@ -135,6 +134,10 @@ class PositionController:
     
     def th_to_target(self):
         return self.angdiff(self.thtarget, self.thmeasure)
+    
+    def th_outside_margin(self, margin):
+        diff = self.angdiff(self.thtarget, self.thmeasure)
+        return diff > margin and diff < -margin
 
     # not sure this is actually needed
     def normalize_theta(self, theta):

@@ -51,11 +51,10 @@ if __name__ == "__main__":
 
     # Iterate through each waypoint
     for wp in waypoints:
+        print("Moving to waypoint ", wp)
         x_setpoint = wp["pos"][0]
         y_setpoint = wp["pos"][1]
         theta_setpoint = math.radians(wp["yaw"])
-        print("theta_setpoint ", theta_setpoint)
-
         pc.set_new_waypoint(x_setpoint, y_setpoint, theta_setpoint)
         
         timer = Timer()
@@ -65,8 +64,6 @@ if __name__ == "__main__":
             # Move it
             pc.update(timer.elapsed())
             timer.reset()
-            print("x y th: ", pc.xmeasure, pc.ymeasure, math.degrees(pc.thmeasure))
-            print("Current wheel velocity: ", pc.v_R, pc.v_L)
 
             # Update plot
             live_plt.update(pc.x_array, pc.y_array)
@@ -76,14 +73,11 @@ if __name__ == "__main__":
 
         # turn to target theta direction
         timer.reset()
-        print("TURNING TO TH TARGET")
-        print(pc.th_to_target())
+        print("TURNING TO TH TARGET", pc.th_to_target() * 57.29, " degrees")
 
-        while pc.th_to_target() > 0.1:
+        while pc.th_outside_margin(0.05):
             pc.update_turning(timer.elapsed())
             timer.reset()
-            print("x y th: ", pc.xmeasure, pc.ymeasure, math.degrees(pc.thmeasure))
-            print("Current wheel velocity: ", pc.v_R, pc.v_L)
 
         print("WAYPOINT REACHED")
 

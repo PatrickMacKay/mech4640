@@ -42,7 +42,6 @@ class PIDController:
 
         self.output = clamp(P + I + D, -self.limit, self.limit)
         self.prevErr = err
-        self.timer.reset()
 
 
         
