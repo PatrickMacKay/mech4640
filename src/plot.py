@@ -3,9 +3,11 @@ import numpy as np
 from mpl_toolkits import mplot3d
 
 class LivePlotter:
-    fig, ax = plt.subplots()
-    plot = ax.scatter([], [])
-    plt.draw()
+
+    def __init__(self):
+        self.fig, self.ax = plt.subplots()
+        self.plot = self.ax.scatter([], [])
+        plt.draw()
 
     def update(self, x_pos, y_pos):
         self.plot = self.ax.scatter(x_pos, y_pos)
