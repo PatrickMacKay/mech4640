@@ -7,7 +7,7 @@ import signal
 
 from util.timer import Timer
 from plot import plotter
-from position_Controller import PositionController
+from positioncontroller import PositionController
 
 CTRL_PARAMS = "config/ctrl_params.json"
 #MOTOR_PARAMS = "config/motor_params.json"
@@ -34,7 +34,7 @@ if __name__ == "__main__":
         pc.vel_stop()
         plot.plot_results(pc.time_array, pc.x_array, pc.y_array)
 
-    signal.signal(signal.SIGINT, signal_handler)
+    #signal.signal(signal.SIGINT, signal_handler)
 
     dirname = os.path.dirname(__file__)
     dirname = os.path.join(dirname, "../")
@@ -60,20 +60,15 @@ if __name__ == "__main__":
     # Run Waypoints #
     #################
 
-    # Initialize position controller
-    pc = PositionController(
-            1, # p,
-            1, # i,
-            1 # d
-        )
+    # Initialize position controller with config params
+    pc = PositionController(cp_json["vel"], cp_json["ang_vel"])
 
     # Iterate through each waypoint
     for wp in waypoints:
+        print("MOVING TO WAYPOINT ", wp)
         x_setpoint = wp["pos"][0]
         y_setpoint = wp["pos"][1]
         theta_setpoint = math.radians(wp["yaw"])
-        print("theta_setpoint ", theta_setpoint)
-
         pc.set_new_waypoint(x_setpoint, y_setpoint, theta_setpoint)
         
         timer = Timer()
@@ -83,31 +78,25 @@ if __name__ == "__main__":
             # Move it
             pc.update(timer.elapsed())
             timer.reset()
-            print("x y th: ", pc.xmeasure, pc.ymeasure, math.degrees(pc.thmeasure))
-            print("Current wheel velocity: ", pc.v_R, pc.v_L)
 
 
         # stop wheels after moving
         pc.vel_stop()
 
         # turn to target theta direction
+        print("TURNING TO TH TARGET", pc.th_to_target(), " radians")
+
         timer.reset()
-        print("TURNING TO TH TARGET")
-        print(pc.th_to_target())
-
-
-        while pc.th_to_target() > 0.1:
+        while pc.th_outside_margin(0.05):
             pc.update_turning(timer.elapsed())
+            print("th = ", pc.th_to_target(), "\r")
             timer.reset()
-            print("x y th: ", pc.xmeasure, pc.ymeasure, math.degrees(pc.thmeasure))
-            print("Current wheel velocity: ", pc.v_R, pc.v_L)
 
         print("WAYPOINT REACHED")
 
         # If there is a pause, wait for the specified period.
         if "pause" in wp:
             time.sleep(wp["pause"])
-        # Iterate through all waypoints
     
     ########
     # Plot #
