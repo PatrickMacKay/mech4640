@@ -3,6 +3,7 @@ import json
 import os
 import math
 import time
+import signal
 
 from util.timer import Timer
 from plot import plot_results, LivePlotter
@@ -21,6 +22,13 @@ if __name__ == "__main__":
     #####################
     # Initialize Config #
     #####################
+
+    # intializing signal interupt handler
+    def signal_handler(*args):
+        pc.vel_stop()
+        plot_results(pc.time_array, pc.x_array, pc.y_array)
+
+    signal.signal(signal.SIGINT, signal_handler)
 
     dirname = os.path.dirname(__file__)
     dirname = os.path.join(dirname, "../")
