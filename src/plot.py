@@ -20,8 +20,8 @@ class plotter:
         self.plotdir = self.create_plot_dir()
 
     def create_plot_dir(self):
-        dirname = os.getcwd(__file__)
-        dirname = os.path.join(dirname, "util/plots/")
+        dirname = os.getcwd()
+        dirname = os.path.join(dirname, "plots/")
         if not os.path.exists(dirname):
             os.makedirs(dirname)
         return dirname

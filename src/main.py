@@ -33,8 +33,9 @@ if __name__ == "__main__":
     def signal_handler(*args):
         pc.vel_stop()
         plot.plot_results(pc.time_array, pc.x_array, pc.y_array)
+        exit(0)
 
-    #signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)
 
     dirname = os.path.dirname(__file__)
     dirname = os.path.join(dirname, "../")
@@ -78,6 +79,7 @@ if __name__ == "__main__":
             # Move it
             pc.update(timer.elapsed())
             timer.reset()
+            time.sleep(0.1)
 
 
         # stop wheels after moving
@@ -91,6 +93,7 @@ if __name__ == "__main__":
             pc.update_turning(timer.elapsed())
             print("th = ", pc.th_to_target(), "\r")
             timer.reset()
+            time.sleep(0.1)
 
         print("WAYPOINT REACHED")
 
