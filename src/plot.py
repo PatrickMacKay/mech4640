@@ -18,7 +18,19 @@ class plotter:
         print(" - ", s)
 
     # Plotting requires four vectors of the same length.
-    def plot_results(self, time_vector, pos_x, pos_y, theta, x_setpoint, y_setpoint, l_vel, r_vel):
+    def plot_results(
+            self,
+            time_vector,
+            pos_x,
+            pos_y,
+            theta,
+            x_setpoint,
+            y_setpoint,
+            l_vel,
+            r_vel,
+            set_l_vel,
+            set_r_vel
+        ):
 
         print("Plotting ", len(pos_x), "samples (%.2f seconds)" % time_vector[-1], " in directory ", self.plotdir)
 
@@ -65,9 +77,21 @@ class plotter:
         plt.show()
         self.list_print("v vs time")
 
+        # set velocity over time
+        plt.figure()
+        plt.plot(time_vector, set_l_vel, label = 'l_vel')
+        plt.plot(time_vector, set_r_vel, label = 'r_vel')
+        plt.legend()
+        plt.title("set velocity vs time")
+        plt.xlabel("time")
+        plt.ylabel("velocity")
+        plt.savefig(self.plotdir + "/set v over time.png")
+        plt.show()
+        self.list_print("set v vs time")
+
         # xy plot
         plt.figure()
-        plt.plot(pos_x, pos_y)
+        plt.plot(pos_x, pos_y, '*')
         plt.title("xy plot")
         plt.xlabel("x")
         plt.ylabel("y")

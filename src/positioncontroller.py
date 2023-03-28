@@ -8,9 +8,9 @@ def clamp(n, smallest, largest):
 
 class PositionController:
     wheel_base_width = 0.095
-    motor_updates_per_cycle = 2
+    motor_updates_per_cycle = 10
     update_counter = 0
-    sampleCheck = 4
+    sampleCheck = 5
 
     def __init__(self, vel_params, ang_vel_params):
 
@@ -52,6 +52,8 @@ class PositionController:
         self.y_setpoint_array = []
         self.v_l_array = []
         self.v_r_array = []
+        self.set_v_l_array = []
+        self.set_v_r_array = []
 
     def set_new_waypoint(self, xtarget = 0, ytarget = 0, thtarget = 0):
         self.xtarget = xtarget
@@ -72,6 +74,8 @@ class PositionController:
         self.y_setpoint_array.append(self.ytarget)
         self.v_l_array.append(l_vel)
         self.v_r_array.append(r_vel)
+        self.set_v_l_array.append(self.v_L)
+        self.set_v_r_array.append(self.v_R)
 
         # Calculate position delta based on encoder values
         th_delta = (r_vel - l_vel) / self.wheel_base_width * dt
@@ -93,7 +97,10 @@ class PositionController:
         # Calculate error for vel and angvel and set as setpoint.
         # Update PID controllers with measurements
         self.vel_pid.state = np.sqrt(np.square(self.xtarget-self.xmeasure)+np.square(self.ytarget-self.ymeasure))
-        self.angvel_pid.state = np.arctan2(self.ytarget - self.ymeasure, self.xtarget - self.xmeasure)
+
+        ang_diff = np.arctan2(self.ytarget - self.ymeasure, self.xtarget - self.xmeasure) - self.thmeasure
+        self.angvel_pid.state = self.normalize_theta(ang_diff)
+
         self.vel_pid.update(dt)
         self.angvel_pid.update(dt)
 
@@ -105,10 +112,11 @@ class PositionController:
         v_L = vel - (ang_vel * self.wheel_base_width / 2)
 
         # Do not write unless the velocities are different
-        if self.v_L != v_L or self.v_R != v_R:
-            self.vc.moveVelCheck(v_L, v_R, self.sampleCheck)
-            self.v_L = v_L
-            self.v_R = v_R
+        #if self.v_L != v_L or self.v_R != v_R:
+        #    self.vc.moveVelCheck(v_L, v_R, self.sampleCheck)
+        #    self.v_L = v_L
+        #    self.v_R = v_R
+        self.vc.moveVelCheck(v_L, v_R, self.sampleCheck)
 
     def update(self, dt):
         self.update_pose(dt)

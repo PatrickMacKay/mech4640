@@ -1,14 +1,14 @@
 {
     "vel": {
-        "p_gain": 0.8,
-        "i_gain": 0,
-        "d_gain": 0,
-        "limit": 0.1
-    },
-    "ang_vel": {
         "p_gain": 0.5,
         "i_gain": 0,
         "d_gain": 0,
-        "limit": 0.8
+        "limit": 0.08
+    },
+    "ang_vel": {
+        "p_gain": 0.8,
+        "i_gain": 0,
+        "d_gain": 0,
+        "limit": 1
     }
 }
