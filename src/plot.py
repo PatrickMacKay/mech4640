@@ -18,13 +18,9 @@ class plotter:
         print(" - ", s)
 
     # Plotting requires four vectors of the same length.
-    def plot_results(self, time_vector, pos_x, pos_y, theta, x_setpoint, y_setpoint):
+    def plot_results(self, time_vector, pos_x, pos_y, theta, x_setpoint, y_setpoint, l_vel, r_vel):
 
-        print("Plotting ", len(pos_x), "samples (%.2f seconds)" % time_vector[-1])
-
-        velocities = np.ones(len(pos_x)) 
-        for i in range(0, len(velocities)):
-            velocities[i] = velocities[i] + np.random.normal(-0.1, 0.1)
+        print("Plotting ", len(pos_x), "samples (%.2f seconds)" % time_vector[-1], " in directory ", self.plotdir)
 
         # x over time
         plt.figure()
@@ -59,7 +55,9 @@ class plotter:
 
         # velocity over time
         plt.figure()
-        plt.plot(time_vector, velocities, label = 'velocities')
+        plt.plot(time_vector, l_vel, label = 'l_vel')
+        plt.plot(time_vector, r_vel, label = 'r_vel')
+        plt.legend()
         plt.title("velocity vs time")
         plt.xlabel("time")
         plt.ylabel("velocity")

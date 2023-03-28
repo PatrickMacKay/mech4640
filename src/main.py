@@ -32,7 +32,9 @@ if __name__ == "__main__":
             pc.y_array,
             pc.th_array,
             pc.x_setpoint_array,
-            pc.y_setpoint_array
+            pc.y_setpoint_array,
+            pc.v_l_array,
+            pc.v_r_array
         )
         print("COMPLETE")
         exit(0)
@@ -88,7 +90,7 @@ if __name__ == "__main__":
             timer.reset()
             time.sleep(0.1)
 
-        print("WAYPOINT REACHED")
+        print("\nWAYPOINT REACHED")
         pc.vel_stop()
 
         # If there is a pause, wait for the specified period.

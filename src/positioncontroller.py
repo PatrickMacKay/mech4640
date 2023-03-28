@@ -10,6 +10,7 @@ class PositionController:
     wheel_base_width = 0.095
     motor_updates_per_cycle = 2
     update_counter = 0
+    sampleCheck = 4
 
     def __init__(self, vel_params, ang_vel_params):
 
@@ -49,6 +50,8 @@ class PositionController:
         self.th_array = []
         self.x_setpoint_array = []
         self.y_setpoint_array = []
+        self.v_l_array = []
+        self.v_r_array = []
 
     def set_new_waypoint(self, xtarget = 0, ytarget = 0, thtarget = 0):
         self.xtarget = xtarget
@@ -67,6 +70,8 @@ class PositionController:
         self.th_array.append(self.thmeasure)
         self.x_setpoint_array.append(self.xtarget)
         self.y_setpoint_array.append(self.ytarget)
+        self.v_l_array.append(l_vel)
+        self.v_r_array.append(r_vel)
 
         # Calculate position delta based on encoder values
         th_delta = (r_vel - l_vel) / self.wheel_base_width * dt
@@ -101,7 +106,7 @@ class PositionController:
 
         # Do not write unless the velocities are different
         if self.v_L != v_L or self.v_R != v_R:
-            self.vc.moveVelCheck(v_L, v_R, 5)
+            self.vc.moveVelCheck(v_L, v_R, self.sampleCheck)
             self.v_L = v_L
             self.v_R = v_R
 
@@ -131,7 +136,7 @@ class PositionController:
         v_R = (ang_vel * self.wheel_base_width / 2)
         v_L = -(ang_vel * self.wheel_base_width / 2)
 
-        self.vc.moveVelCheck(v_L, v_R, 5)
+        self.vc.moveVelCheck(v_L, v_R, self.sampleCheck)
     
     def vel_stop(self):
         self.vc.moveVel(0, 0)
