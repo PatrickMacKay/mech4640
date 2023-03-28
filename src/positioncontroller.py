@@ -8,6 +8,8 @@ def clamp(n, smallest, largest):
 
 class PositionController:
     wheel_base_width = 0.095
+    motor_updates_per_cycle = 2
+    update_counter = 0
 
     def __init__(self, vel_params, ang_vel_params):
 
@@ -45,6 +47,8 @@ class PositionController:
         self.x_array = []
         self.y_array = []
         self.th_array = []
+        self.x_setpoint_array = []
+        self.y_setpoint_array = []
 
     def set_new_waypoint(self, xtarget = 0, ytarget = 0, thtarget = 0):
         self.xtarget = xtarget
@@ -61,17 +65,22 @@ class PositionController:
         self.x_array.append(self.xmeasure)
         self.y_array.append(self.ymeasure)
         self.th_array.append(self.thmeasure)
+        self.x_setpoint_array.append(self.xtarget)
+        self.y_setpoint_array.append(self.ytarget)
 
         # Calculate position delta based on encoder values
         th_delta = (r_vel - l_vel) / self.wheel_base_width * dt
+        self.thmeasure = self.thmeasure + th_delta
+        self.thmeasure = self.normalize_theta(self.thmeasure)
+
         x_delta = 0.5*(r_vel + l_vel) * np.cos(self.thmeasure) * dt
         y_delta = 0.5*(r_vel + l_vel) * np.sin(self.thmeasure) * dt
 
-        # Update current measured position
-        self.thmeasure = self.thmeasure + th_delta
-        self.thmeasure = self.normalize_theta(self.thmeasure)
+        # Update current measured positions
         self.xmeasure = self.xmeasure + x_delta
         self.ymeasure = self.ymeasure + y_delta
+
+        print("    Current pose: x = %.3f" %self.xmeasure, " y = %.3f" %self.ymeasure, " th = %.2f" %self.thmeasure, end="\r")
 
 
     def update_vel(self, dt):
@@ -91,19 +100,26 @@ class PositionController:
         v_L = vel - (ang_vel * self.wheel_base_width / 2)
 
         # Do not write unless the velocities are different
-        if self.v_L != v_L and self.v_R != v_R:
-            self.vc.moveVel(v_L, v_R)
+        if self.v_L != v_L or self.v_R != v_R:
+            self.vc.moveVelCheck(v_L, v_R, 5)
             self.v_L = v_L
             self.v_R = v_R
 
-
     def update(self, dt):
         self.update_pose(dt)
-        self.update_vel(dt)
+        self.update_counter += 1
+
+        if self.update_counter >= self.motor_updates_per_cycle:
+            self.update_counter = 0
+            self.update_vel(dt)
     
     def update_turning(self, dt):
         self.update_pose(dt)
-        self.turn_to_th_target(dt)
+        self.update_counter += 1
+
+        if self.update_counter >= self.motor_updates_per_cycle:
+            self.update_counter = 0
+            self.turn_to_th_target(dt)
 
     def turn_to_th_target(self, dt):
         # Update PID controller
@@ -115,7 +131,7 @@ class PositionController:
         v_R = (ang_vel * self.wheel_base_width / 2)
         v_L = -(ang_vel * self.wheel_base_width / 2)
 
-        self.vc.moveVel(v_L, v_R)
+        self.vc.moveVelCheck(v_L, v_R, 5)
     
     def vel_stop(self):
         self.vc.moveVel(0, 0)

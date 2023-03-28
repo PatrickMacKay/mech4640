@@ -10,8 +10,6 @@ from plot import plotter
 from positioncontroller import PositionController
 
 CTRL_PARAMS = "config/ctrl_params.json"
-#MOTOR_PARAMS = "config/motor_params.json"
-
 WAYPOINTS_FILE = "config/waypoints.json"
 
 # Entry point
@@ -23,36 +21,33 @@ if __name__ == "__main__":
     # Initialize Config #
     #####################
 
-    # initialize plotter
+    # Initialize plotter and signal handler
     plot = plotter()
-
-    # create dir for plots
-    plot.create_plot_dir()
-
-    # intializing signal interupt handler
     def signal_handler(*args):
+        print("\nSIGINT Interrupt. Stopping robot\n")
         pc.vel_stop()
-        plot.plot_results(pc.time_array, pc.x_array, pc.y_array)
+        plot.plot_results(
+            pc.time_array,
+            pc.x_array,
+            pc.y_array,
+            pc.th_array,
+            pc.x_setpoint_array,
+            pc.y_setpoint_array
+        )
+        print("COMPLETE")
         exit(0)
-
     signal.signal(signal.SIGINT, signal_handler)
 
     dirname = os.path.dirname(__file__)
     dirname = os.path.join(dirname, "../")
 
     cp_path = os.path.join(dirname, CTRL_PARAMS)
-    #mp_path = os.path.join(dirname, MOTOR_PARAMS)
     wp_path = os.path.join(dirname, WAYPOINTS_FILE)
 
     with open(cp_path) as cp_file:
         cp_json = json.loads(cp_file.read())
-    #with open(mp_path) as mp_file:
-    #    mp_json = json.loads(mp_file.read())
     with open(wp_path) as wp_file:
         waypoints = json.loads(wp_file.read())
-
-    # Initialize Live Plot
-    # live_plt = LivePlotter()
 
     # Print initialization time
     print("Initialization completed in %1.2f seconds" %init_timer.elapsed())
@@ -66,7 +61,7 @@ if __name__ == "__main__":
 
     # Iterate through each waypoint
     for wp in waypoints:
-        print("MOVING TO WAYPOINT ", wp)
+        print("\nMOVING TO WAYPOINT ", wp)
         x_setpoint = wp["pos"][0]
         y_setpoint = wp["pos"][1]
         theta_setpoint = math.radians(wp["yaw"])
@@ -75,27 +70,26 @@ if __name__ == "__main__":
         timer = Timer()
 
         # Keep asking the position controller if we're there yet.
-        while pc.dist_to_target() > 0.1:
+        while pc.dist_to_target() > 0.04:
             # Move it
             pc.update(timer.elapsed())
             timer.reset()
             time.sleep(0.1)
 
-
         # stop wheels after moving
         pc.vel_stop()
 
         # turn to target theta direction
-        print("TURNING TO TH TARGET", pc.th_to_target(), " radians")
+        print("\nTURNING TO TH TARGET (theta = %.2f" %theta_setpoint, " rads)")
 
         timer.reset()
-        while pc.th_outside_margin(0.05):
+        while pc.th_outside_margin(0.02):
             pc.update_turning(timer.elapsed())
-            print("th = ", pc.th_to_target(), "\r")
             timer.reset()
             time.sleep(0.1)
 
         print("WAYPOINT REACHED")
+        pc.vel_stop()
 
         # If there is a pause, wait for the specified period.
         if "pause" in wp:
