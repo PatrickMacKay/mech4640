@@ -7,8 +7,9 @@ def clamp(n, smallest, largest):
     return max(smallest, min(n, largest))
 
 class PositionController:
-    wheel_base_width = 0.095
-    motor_updates_per_cycle = 10
+    #wheel_base_width = 0.095
+    wheel_base_width = 0.08
+    motor_updates_per_cycle = 5
     update_counter = 0
     sampleCheck = 5
 
@@ -71,6 +72,7 @@ class PositionController:
     def update_pose(self, dt):
         # Update velocity controller
         l_sig, r_sig, l_time, r_time, l_vel, r_vel, l_enc, r_enc = self.vc.update()
+        self.vc.movePWM(l_sig, r_sig)
 
         # Add to cumulative arrays
         self.elapsed_time += dt
@@ -124,7 +126,8 @@ class PositionController:
         #    self.vc.moveVelCheck(v_L, v_R, self.sampleCheck)
         #    self.v_L = v_L
         #    self.v_R = v_R
-        self.vc.moveVelCheck(v_L, v_R, self.sampleCheck)
+        # self.vc.moveVelCheck(v_L, v_R, self.sampleCheck)
+        self.vc.setTarVelCheck(v_L, v_R, self.sampleCheck)
 
     def update(self, dt):
         self.update_pose(dt)
@@ -150,7 +153,7 @@ class PositionController:
 
         # if robot gets stuck turning, it has at least a minimum value
 
-        minimum = 0.06
+        minimum = 0.2
         if np.abs(ang_vel) < minimum:
             if ang_vel >= 0:
                 ang_vel = minimum
@@ -161,7 +164,8 @@ class PositionController:
         v_R = (ang_vel * self.wheel_base_width / 2)
         v_L = -(ang_vel * self.wheel_base_width / 2)
 
-        self.vc.moveVelCheck(v_L, v_R, self.sampleCheck)
+        #self.vc.moveVelCheck(v_L, v_R, self.sampleCheck)
+        self.vc.setTarVelCheck(v_L, v_R, self.sampleCheck)
     
     def vel_stop(self):
         self.vc.moveVel(0, 0)

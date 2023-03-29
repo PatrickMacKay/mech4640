@@ -6,16 +6,16 @@
         "limit": 0.08
     },
     "ang_vel_forward": {
-        "p_gain": 0.6,
+        "p_gain": 0.7,
         "i_gain": 0,
         "d_gain": 0,
-        "limit": 1
+        "limit": 0.8
     },
     "ang_vel_turning": {
         "p_gain": 0.6,
         "i_gain": 0,
         "d_gain": 0,
-        "limit": 1
+        "limit": 0.5
     }
 
 

@@ -80,7 +80,7 @@ if __name__ == "__main__":
 
         # Keep asking the position controller if we're there yet.
         timer.reset()
-        while pc.dist_to_target() > 0.04:
+        while pc.dist_to_target() > 0.02:
             # Move it
             pc.update(timer.elapsed())
             timer.reset()
@@ -93,7 +93,7 @@ if __name__ == "__main__":
         print("\nTURNING TO TH TARGET (theta = %.2f" %theta_setpoint, " rads)")
 
         timer.reset()
-        while pc.th_outside_margin(0.35):
+        while pc.th_outside_margin(0.1):
             pc.update_turning(timer.elapsed())
             timer.reset()
             time.sleep(0.025)
