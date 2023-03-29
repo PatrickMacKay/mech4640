@@ -12,7 +12,7 @@ class PositionController:
     update_counter = 0
     sampleCheck = 5
 
-    def __init__(self, vel_params, ang_vel_params):
+    def __init__(self, vel_params, ang_vel_forward_params, ang_vel_turning_params):
 
         # Initialize PID Controllers with parameters (p, i, d, lim)
         self.vel_pid = PIDController(
@@ -22,13 +22,21 @@ class PositionController:
             vel_params["limit"]
         )
         self.vel_pid.setpoint = 0
-        self.angvel_pid = PIDController(
-            ang_vel_params["p_gain"],
-            ang_vel_params["i_gain"],
-            ang_vel_params["d_gain"],
-            ang_vel_params["limit"]
+        self.angvelforward_pid = PIDController(
+            ang_vel_forward_params["p_gain"],
+            ang_vel_forward_params["i_gain"],
+            ang_vel_forward_params["d_gain"],
+            ang_vel_forward_params["limit"]
         )
-        self.angvel_pid.setpoint = 0
+        self.angvelforward_pid.setpoint = 0
+
+        self.angvelturning_pid = PIDController(
+            ang_vel_forward_params["p_gain"],
+            ang_vel_forward_params["i_gain"],
+            ang_vel_forward_params["d_gain"],
+            ang_vel_forward_params["limit"]
+        )
+        self.angvelturning_pid.setpoint = 0
 
         # Initialize velocity controller
         self.vc = velocityController()
@@ -99,13 +107,13 @@ class PositionController:
         self.vel_pid.state = np.sqrt(np.square(self.xtarget-self.xmeasure)+np.square(self.ytarget-self.ymeasure))
 
         ang_diff = np.arctan2(self.ytarget - self.ymeasure, self.xtarget - self.xmeasure) - self.thmeasure
-        self.angvel_pid.state = self.normalize_theta(ang_diff)
+        self.angvelforward_pid.state = self.normalize_theta(ang_diff)
 
         self.vel_pid.update(dt)
-        self.angvel_pid.update(dt)
+        self.angvelforward_pid.update(dt)
 
         vel = self.vel_pid.output
-        ang_vel = self.angvel_pid.output
+        ang_vel = self.angvelforward_pid.output
 
         # Assign velocities with direction of angvel
         v_R = vel + (ang_vel * self.wheel_base_width / 2)
@@ -136,9 +144,18 @@ class PositionController:
 
     def turn_to_th_target(self, dt):
         # Update PID controller
-        self.angvel_pid.state = self.th_to_target()
-        self.angvel_pid.update(dt)
-        ang_vel = self.angvel_pid.output
+        self.angvelturning_pid.state = self.th_to_target()
+        self.angvelturning_pid.update(dt)
+        ang_vel = self.angvelturning_pid.output
+
+        # if robot gets stuck turning, it has at least a minimum value
+
+        minimum = 0.06
+        if np.abs(ang_vel) < minimum:
+            if ang_vel >= 0:
+                ang_vel = minimum
+            elif ang_vel <=0:
+                ang_vel = -minimum
 
         # calculate R & L wheel velocities based
         v_R = (ang_vel * self.wheel_base_width / 2)

@@ -61,7 +61,7 @@ if __name__ == "__main__":
     timer = Timer()
 
     # Initialize position controller with config params
-    pc = PositionController(cp_json["vel"], cp_json["ang_vel"])
+    pc = PositionController(cp_json["vel"], cp_json["ang_vel_forward"], cp_json["ang_vel_turning"])
 
     # Print initialization time
     print("Initialization completed in %1.2f seconds" %init_timer.elapsed())
@@ -93,7 +93,7 @@ if __name__ == "__main__":
         print("\nTURNING TO TH TARGET (theta = %.2f" %theta_setpoint, " rads)")
 
         timer.reset()
-        while pc.th_outside_margin(0.1):
+        while pc.th_outside_margin(0.35):
             pc.update_turning(timer.elapsed())
             timer.reset()
             time.sleep(0.025)
