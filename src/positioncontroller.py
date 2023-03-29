@@ -8,7 +8,7 @@ def clamp(n, smallest, largest):
 
 class PositionController:
     #wheel_base_width = 0.095
-    wheel_base_width = 0.08
+    wheel_base_width = 0.055
     motor_updates_per_cycle = 5
     update_counter = 0
     sampleCheck = 5
