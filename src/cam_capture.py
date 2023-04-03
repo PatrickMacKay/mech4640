@@ -20,7 +20,11 @@ class CameraTime:
             os.makedirs(directory)
 
         self.camera.start_preview()
+<<<<<<< HEAD
         self.camera.annotate_text = ""
+=======
+        self.camera.annotate_text = datetime.now().strftime(" %a, %d, %b, %Y, %H:%M:%S.%f")
+>>>>>>> 8f7684f5b4674468addfc300b2c2194641a70b4a
         self.camera.capture(os.path.join(directory, filename))
         self.camera.stop_preview()
         print(f"Picture saved as {filename} in directory {directory}")
@@ -29,5 +33,9 @@ class CameraTime:
         self.camera.close()
 
 if __name__ == "__main__":
+<<<<<<< HEAD
     camera = Camera()
+=======
+    camera = CameraTime()
+>>>>>>> 8f7684f5b4674468addfc300b2c2194641a70b4a
     camera.capture_image()
