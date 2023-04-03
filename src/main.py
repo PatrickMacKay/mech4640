@@ -91,13 +91,18 @@ if __name__ == "__main__":
             timer.reset()
             time.sleep(0.025)
 
+
+
+
         # stop wheels after moving
         pc.vel_stop()
+        input("we are pausing, press enter to continue")
         #capture image
         cam.capture_image()
 
         # turn to target theta direction
         print("\nTURNING TO TH TARGET (theta = %.2f" %theta_setpoint, " rads)")
+        
 
         timer.reset()
         while pc.th_outside_margin(0.1):
@@ -107,6 +112,8 @@ if __name__ == "__main__":
 
         print("\nWAYPOINT REACHED")
         pc.vel_stop()
+        
+        input("we are pausing, press enter to continue")
 
         # If there is a pause, wait for the specified period.
         if "pause" in wp:

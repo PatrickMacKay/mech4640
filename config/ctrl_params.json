@@ -15,7 +15,7 @@
         "p_gain": 0.6,
         "i_gain": 0,
         "d_gain": 0,
-        "limit": 0.5
+        "limit": 0.8
     }
 
 
