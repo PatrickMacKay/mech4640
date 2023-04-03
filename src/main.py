@@ -8,7 +8,7 @@ import signal
 from util.timer import Timer
 from plot import plotter
 from positioncontroller import PositionController
-from .cam_capture import CameraTime
+from cam_capture import CameraTime
 
 CTRL_PARAMS = "config/ctrl_params.json"
 WAYPOINTS_FILE = "config/waypoints.json"

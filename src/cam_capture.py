@@ -4,7 +4,7 @@ from datetime import datetime
 import time
 
 
-class Camera:
+class CameraTime:
     def __init__(self):
         self.camera = picamera.PiCamera()
         self.camera.resolution = (2592, 1944)
@@ -20,7 +20,7 @@ class Camera:
             os.makedirs(directory)
 
         self.camera.start_preview()
-        self.camera.annotate_text = ""
+        self.camera.annotate_text = datetime.now().strftime(" %a, %d, %b, %Y, %H:%M:%S.%f")
         self.camera.capture(os.path.join(directory, filename))
         self.camera.stop_preview()
         print(f"Picture saved as {filename} in directory {directory}")
@@ -29,5 +29,5 @@ class Camera:
         self.camera.close()
 
 if __name__ == "__main__":
-    camera = Camera()
+    camera = CameraTime()
     camera.capture_image()
